@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -59,8 +64,7 @@ data class CollectBox(
 )
 
 data class PaymentBox(
-    val title: String,
-    val icon: Int
+    val description: String, val icon: Int
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,17 +190,15 @@ fun FloatingTabView(
         NavigationBar(contentColor = Color(0xFF14C6A4)) {
             tabBarItems.forEachIndexed { index, item ->
 
-                NavigationBarItem(
-                    label = {
-                        Text(text = item.title)
-                    },
-                    icon = {
-                        Icon(
-                            painterResource(id = item.icon),
-                            contentDescription = item.title,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    },
+                NavigationBarItem(label = {
+                    Text(text = item.title)
+                }, icon = {
+                    Icon(
+                        painterResource(id = item.icon),
+                        contentDescription = item.title,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
 
                     selected = index == selectedTabIndex, onClick = {
                         if (index != selectedTabIndex) {
@@ -208,11 +210,12 @@ fun FloatingTabView(
                             }
                         }
                     }, colors = androidx.compose.material3.NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color(0xFF14C6A4),
-                            indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                LocalAbsoluteTonalElevation.current
-                            )
-                        )
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            LocalAbsoluteTonalElevation.current
+                        ),
+                        selectedTextColor = MaterialTheme.colorScheme.primary
+                    )
                 )
             }
         }
@@ -223,13 +226,21 @@ fun FloatingTabView(
 @Composable
 fun HomeViewUI() {
     Column() {
-        Box(modifier = Modifier.padding(horizontal = 10.dp).shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)
+        ) {
             CollectionBox()
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Box(modifier = Modifier.padding(horizontal = 10.dp).shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)
+        ) {
             PaymentBox()
         }
     }
@@ -240,20 +251,16 @@ fun CollectionBox() {
 
     val collectBoxItems = listOf(
         CollectBox(
-            title = "Identipago",
-            icon = R.drawable.identipago
+            title = "Identipago", icon = R.drawable.identipago
         ),
         CollectBox(
-            title = "Chinchin",
-            icon = R.drawable.chinchin
+            title = "Chinchin", icon = R.drawable.chinchin
         ),
         CollectBox(
-            title = "Pago Movil",
-            icon = R.drawable.pago_movil
+            title = "Pago Movil", icon = R.drawable.pago_movil
         ),
         CollectBox(
-            title = "Bancos Nacionales",
-            icon = R.drawable.bancos_nacionales
+            title = "Bancos Nacionales", icon = R.drawable.bancos_nacionales
         ),
     )
 
@@ -262,7 +269,7 @@ fun CollectionBox() {
             text = "Recaudar",
             fontWeight = FontWeight.W400,
             fontSize = 16.sp,
-            modifier = Modifier.padding(top = 24.dp, start = 24.dp)
+            modifier = Modifier.padding(top = 16.dp, start = 24.dp)
         )
 
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
@@ -312,34 +319,87 @@ fun PaymentBox() {
 
     val paymentBoxItems = listOf(
         PaymentBox(
-            title = "movistar",
-            icon = R.drawable.movistar
+            description = "Movistar", icon = R.drawable.movistar
         ),
         PaymentBox(
-            title = "movistar",
-            icon = R.drawable.movistar
+            description = "Movistar", icon = R.drawable.movistar
         ),
         PaymentBox(
-            title = "SimpleTV",
-            icon = R.drawable.movistar
+            description = "SimpleTV", icon = R.drawable.simple_tv
         ),
         PaymentBox(
-            title = "movistar",
-            icon = R.drawable.movistar
+            description = "Digitel", icon = R.drawable.digitel
         ),
         PaymentBox(
-            title = "movistar",
-            icon = R.drawable.movistar
+            description = "Movistar", icon = R.drawable.movistar
         ),
     )
 
-    Column(modifier = Modifier.background(Color.White)) {
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+            .padding(10.dp)
+    ) {
         Text(
             text = "Pagos",
             fontWeight = FontWeight.W400,
             fontSize = 16.sp,
-            modifier = Modifier.padding(top = 24.dp, start = 24.dp)
+            modifier = Modifier.padding(top = 12.dp, start = 24.dp, bottom = 12.dp)
         )
-    }
 
+        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+            items(paymentBoxItems) { item ->
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp, vertical = 5.dp)
+                        .border(1.2.dp, Color(0xFF2D2A26), RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painterResource(id = item.icon),
+                        contentDescription = item.description,
+                        tint = Color(0xFF2D2A26),
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .width(80.dp)
+                            .height(40.dp)
+                    )
+                }
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp) // Espacio adicional entre los elementos de la lista y el botón
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center, // Centra el contenido horizontalmente
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { /* Manejar clic del botón */ },
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+                                .padding(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Agregar",
+                                tint = Color.White,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
