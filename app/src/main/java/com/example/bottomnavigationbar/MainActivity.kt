@@ -51,6 +51,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.bottomnavigationbar.navigation.AppNavigation
 import com.example.bottomnavigationbar.ui.theme.CustomBottomNavigationBarTheme
 
 data class TabBarItem(
@@ -72,6 +73,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
+            AppNavigation()
+
+            /*
             val tabBarItems = listOf(
                 TabBarItem(
                     title = "Inicio",
@@ -107,21 +112,47 @@ class MainActivity : ComponentActivity() {
                                 }
                             })
 
-                    // ChinChin Logo
-                    Image(painterResource(id = R.drawable.chinchin_logo),
-                        contentDescription = "Chinchin Logo",
+                    Row(
                         modifier = Modifier
-                            .size(140.dp)
-                            .layout { measurable, constraints ->
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // ChinChin Logo
+                        Image(painterResource(id = R.drawable.chinchin_logo),
+                            contentDescription = "Chinchin Logo",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .layout { measurable, constraints ->
+                                    val placeable = measurable.measure(constraints)
+                                    layout(placeable.width, placeable.height) {
+                                        placeable.place(
+                                            0, -100
+                                        ) // Posiciona la imagen en la esquina superior izquierda
+                                    }
+                                }
+                                .padding(16.dp) // Añadir espacio desde el borde
+                        )
+
+                        IconButton(
+                            modifier = Modifier.layout { measurable, constraints ->
                                 val placeable = measurable.measure(constraints)
                                 layout(placeable.width, placeable.height) {
                                     placeable.place(
                                         0, -100
                                     ) // Posiciona la imagen en la esquina superior izquierda
                                 }
-                            }
-                            .padding(16.dp) // Añadir espacio desde el borde
-                    )
+                            },
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Abrir Menú",
+                                tint = Color(0xFF2D2A26),
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+                    }
 
                     // Contenido principal
                     Column(
@@ -169,233 +200,237 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }*/
         }
     }
-}
 
-@Composable
-fun FloatingTabView(
-    tabBarItems: List<TabBarItem>,
-    navController: NavHostController,
-    floatingMargin: Dp = 16.dp,
-    selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit
-) {
-    // Wrapping our NavigationBar in a Surface to apply elevation.
-    Surface(
-        modifier = Modifier.padding(all = floatingMargin),
-        shape = MaterialTheme.shapes.extraLarge, // This provides rounded edges to the Surface
-        shadowElevation = 2.dp // Adjust shadow elevation for the floating effect
+    @Composable
+    fun FloatingTabView(
+        tabBarItems: List<TabBarItem>,
+        navController: NavHostController,
+        floatingMargin: Dp = 16.dp,
+        selectedTabIndex: Int,
+        onTabSelected: (Int) -> Unit
     ) {
-        NavigationBar(contentColor = Color(0xFF14C6A4)) {
-            tabBarItems.forEachIndexed { index, item ->
-
-                NavigationBarItem(label = {
-                    Text(text = item.title)
-                }, icon = {
-                    Icon(
-                        painterResource(id = item.icon),
-                        contentDescription = item.title,
-                        modifier = Modifier.size(20.dp),
-                    )
-                },
-
-                    selected = index == selectedTabIndex, onClick = {
-                        if (index != selectedTabIndex) {
-                            onTabSelected(index)
-                            navController.navigate(item.title) {
-                                // This makes sure the back button does not navigate through the tab history.
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                        }
-                    }, colors = androidx.compose.material3.NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-                            LocalAbsoluteTonalElevation.current
-                        ),
-                        selectedTextColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun HomeViewUI() {
-    Column() {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)
+        // Wrapping our NavigationBar in a Surface to apply elevation.
+        Surface(
+            modifier = Modifier.padding(all = floatingMargin),
+            shape = MaterialTheme.shapes.extraLarge, // This provides rounded edges to the Surface
+            shadowElevation = 2.dp // Adjust shadow elevation for the floating effect
         ) {
-            CollectionBox()
-        }
+            NavigationBar(contentColor = MaterialTheme.colorScheme.primary) {
+                tabBarItems.forEachIndexed { index, item ->
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)
-        ) {
-            PaymentBox()
-        }
-    }
-}
-
-@Composable
-fun CollectionBox() {
-
-    val collectBoxItems = listOf(
-        CollectBox(
-            title = "Identipago", icon = R.drawable.identipago
-        ),
-        CollectBox(
-            title = "Chinchin", icon = R.drawable.chinchin
-        ),
-        CollectBox(
-            title = "Pago Movil", icon = R.drawable.pago_movil
-        ),
-        CollectBox(
-            title = "Bancos Nacionales", icon = R.drawable.bancos_nacionales
-        ),
-    )
-
-    Column(modifier = Modifier.background(Color.White)) {
-        Text(
-            text = "Recaudar",
-            fontWeight = FontWeight.W400,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 16.dp, start = 24.dp)
-        )
-
-        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-            items(collectBoxItems) { item ->
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                        .clip(CircleShape) // Aplica el clip de forma circular al box
-                        .background(color = Color(0xFF2D2A26))
-                        .aspectRatio(1f) // Asegura que el width y el height sean iguales para hacer el círculo
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
+                    NavigationBarItem(label = {
+                        Text(text = item.title)
+                    }, icon = {
                         Icon(
                             painterResource(id = item.icon),
                             contentDescription = item.title,
-                            tint = Color.White,
+                            modifier = Modifier.size(20.dp),
                         )
-                        Spacer(modifier = Modifier.height(5.dp))
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp) // Agrego padding horizontal para controlar el ancho máximo
+                    },
+
+                        selected = index == selectedTabIndex, onClick = {
+                            if (index != selectedTabIndex) {
+                                onTabSelected(index)
+                                navController.navigate(item.title) {
+                                    // This makes sure the back button does not navigate through the tab history.
+                                    popUpTo(navController.graph.startDestinationId)
+                                    launchSingleTop = true
+                                }
+                            }
+                        }, colors = androidx.compose.material3.NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                LocalAbsoluteTonalElevation.current
+                            ),
+                            selectedTextColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+
+    @Composable
+    fun HomeViewUI() {
+        Column() {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)
+            ) {
+                CollectionBox()
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.extraLarge)
+            ) {
+                PaymentBox()
+            }
+        }
+    }
+
+    @Composable
+    fun CollectionBox() {
+
+        val collectBoxItems = listOf(
+            CollectBox(
+                title = "Identipago", icon = R.drawable.identipago
+            ),
+            CollectBox(
+                title = "Chinchin", icon = R.drawable.chinchin
+            ),
+            CollectBox(
+                title = "Pago Movil", icon = R.drawable.pago_movil
+            ),
+            CollectBox(
+                title = "Bancos Nacionales", icon = R.drawable.bancos_nacionales
+            ),
+        )
+
+        Column(modifier = Modifier.background(Color.White)) {
+            Text(
+                text = "Recaudar",
+                fontWeight = FontWeight.W400,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 16.dp, start = 24.dp)
+            )
+
+            LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                items(collectBoxItems) { item ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                            .clip(CircleShape) // Aplica el clip de forma circular al box
+                            .background(color = Color(0xFF2D2A26))
+                            .aspectRatio(1f) // Asegura que el width y el height sean iguales para hacer el círculo
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Text(
-                                text = item.title,
-                                color = Color.White,
-                                fontWeight = FontWeight.W500,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis // Esto garantiza que el texto se divida en dos líneas si es necesario
+                            Icon(
+                                painterResource(id = item.icon),
+                                contentDescription = item.title,
+                                tint = Color.White,
                             )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp) // Agrego padding horizontal para controlar el ancho máximo
+                            ) {
+                                Text(
+                                    text = item.title,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.W500,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis // Esto garantiza que el texto se divida en dos líneas si es necesario
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 
-@Composable
-fun PaymentBox() {
+    @Composable
+    fun PaymentBox() {
 
-    val paymentBoxItems = listOf(
-        PaymentBox(
-            description = "Movistar", icon = R.drawable.movistar
-        ),
-        PaymentBox(
-            description = "Movistar", icon = R.drawable.movistar
-        ),
-        PaymentBox(
-            description = "SimpleTV", icon = R.drawable.simple_tv
-        ),
-        PaymentBox(
-            description = "Digitel", icon = R.drawable.digitel
-        ),
-        PaymentBox(
-            description = "Movistar", icon = R.drawable.movistar
-        ),
-    )
-
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-            .padding(10.dp)
-    ) {
-        Text(
-            text = "Pagos",
-            fontWeight = FontWeight.W400,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 12.dp, start = 24.dp, bottom = 12.dp)
+        val paymentBoxItems = listOf(
+            PaymentBox(
+                description = "Movistar", icon = R.drawable.movistar
+            ),
+            PaymentBox(
+                description = "Movistar", icon = R.drawable.movistar
+            ),
+            PaymentBox(
+                description = "SimpleTV", icon = R.drawable.simple_tv
+            ),
+            PaymentBox(
+                description = "Digitel", icon = R.drawable.digitel
+            ),
+            PaymentBox(
+                description = "Movistar", icon = R.drawable.movistar
+            ),
         )
 
-        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-            items(paymentBoxItems) { item ->
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 5.dp, vertical = 5.dp)
-                        .border(1.2.dp, Color(0xFF2D2A26), RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painterResource(id = item.icon),
-                        contentDescription = item.description,
-                        tint = Color(0xFF2D2A26),
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .width(80.dp)
-                            .height(40.dp)
-                    )
-                }
-            }
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(10.dp)
+        ) {
+            Text(
+                text = "Pagos",
+                fontWeight = FontWeight.W400,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 12.dp, start = 24.dp, bottom = 12.dp)
+            )
 
-            item {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp) // Espacio adicional entre los elementos de la lista y el botón
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    Row(
+            LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                items(paymentBoxItems) { item ->
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center, // Centra el contenido horizontalmente
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(horizontal = 5.dp, vertical = 5.dp)
+                            .border(1.2.dp, Color(0xFF2D2A26), RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
                     ) {
-                        IconButton(
-                            onClick = { /* Manejar clic del botón */ },
+                        Icon(
+                            painterResource(id = item.icon),
+                            contentDescription = item.description,
+                            tint = Color(0xFF2D2A26),
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-                                .padding(8.dp)
+                                .padding(5.dp)
+                                .width(80.dp)
+                                .height(40.dp)
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(16.dp) // Espacio adicional entre los elementos de la lista y el botón
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center, // Centra el contenido horizontalmente
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Agregar",
-                                tint = Color.White,
-                                modifier = Modifier.size(30.dp)
-                            )
+                            IconButton(
+                                onClick = { /* Manejar clic del botón */ },
+                                modifier = Modifier
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        shape = CircleShape
+                                    )
+                                    .padding(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Agregar",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
                         }
                     }
                 }
